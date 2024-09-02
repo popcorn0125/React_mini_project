@@ -62,7 +62,6 @@ app.post('/login', (req, res) => {
         }
         else {
             // 세션 생성 부분
-            console.log('로그인 성공');
             res.send({result: body.id, nickname : result[0].nickname}); 
 
         }
@@ -73,18 +72,30 @@ app.post('/login', (req, res) => {
 /********************************************************************* */
 
 /******* 게시글 불러오기 등록, 수정, 삭제 ***************************************************/
-// 불러오기
+// 모든 게시글 불러오기
 app.post('/getBoard', (req, res) => {
 
     const sql = 'select b.idx as idx, b.title as title, b.content as content, b.create_date as create_date, m.user_nickname as nickname' + 
                 ' from board b join member m ON b.user_id = m.user_id '+
                 'where b.isdelete = \'0\' order by b.idx DESC';
     conn.query(sql, function (err, result) {
-        console.log('result: ', result);
         if (err) console.log('query is not excuted: ' + err);
         res.send({result:result});
     })
 })
+// 게시글 상세 내용 불러오기
+app.post('/detailBoard', (req, res) => {
+    let body = req.body;
+    const sql = 'select b.title as title, b.content as content, b.create_date as create_date, m.user_nickname as nickname' + 
+                ' from board b join member m ON b.user_id = m.user_id '+
+                'where b.idx = ?';
+    const params = [body.idx]
+    conn.query(sql, params, function (err, result) {
+        if (err) console.log('query is not excuted: ' + err);
+        res.send({result:result});
+    })
+})
+
 // 등록
 app.post('/createBoard', (req, res) => {
     let body = req.body;

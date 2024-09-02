@@ -25,26 +25,31 @@ function Board() {
     return (
         <>
             <Top />
+            
             <div className="blog"> 
-                {board.map((info) => (
+                { board != undefined ? board.map((info) => (
                     
                     <div key={info.idx} className="conteudo space">
-                        <div className="post-info">
+                        {/* <div className="post-info">
                             Posted by {info.nickname}
-                        </div>
+                        </div> */}
                         <h1>{info.title}</h1>
                         <hr />
                         <p>{info.content}</p>
                         <hr />
                         <div className="post-info">
-                            작성일 - {info.create_date}
+                            작성자 : {info.nickname}
+                        </div>
+                        <br/>
+                        <div className="post-info">
+                        작성일 : {new Date(info.create_date).toLocaleString()}
                         </div>
                         <br />
                         <a href={`/detail?no=${info.idx}`} className="continue-lendo">
                             Read more →
                         </a>
                     </div>
-                ))}  
+                )) : ''}  
             </div>
         </>
     );

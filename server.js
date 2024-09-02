@@ -5,11 +5,18 @@ const server = require('http').createServer(app);
 // const mysql = require('mysql2');
 const db = require('./mysql.js');
 const conn = db.init();
+const expressSession = require('express-session');
 
 app.set('port', 5050);
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded( {extended : false}));
+// 세션 사용 미들웨어 설정
+app.use(expressSession({
+    secret: 'my Key',
+    resave: true,
+    saveUninitialized: true
+}));
 
 /******* 회원 가입 ***************************************************/
 // 회원 가입
@@ -62,12 +69,21 @@ app.post('/login', (req, res) => {
         }
         else {
             // 세션 생성 부분
+            req.session.user = {
+                id : body.id,
+                nickname: result[0].nickname
+            };
             res.send({result: body.id, nickname : result[0].nickname}); 
-
         }
         
     })
 
+})
+
+// 로그아웃
+app.post('/logout', (req, res) => {
+    let body = req.body;
+    req.session.destroy();
 })
 /********************************************************************* */
 
@@ -83,7 +99,7 @@ app.post('/getBoard', (req, res) => {
         res.send({result:result});
     })
 })
-// 게시글 상세 내용 불러오기
+// 하나의 게시글 내용 불러오기
 app.post('/detailBoard', (req, res) => {
     let body = req.body;
     const sql = 'select b.title as title, b.content as content, b.create_date as create_date, m.user_nickname as nickname' + 
@@ -95,6 +111,7 @@ app.post('/detailBoard', (req, res) => {
         res.send({result:result});
     })
 })
+
 
 // 등록
 app.post('/createBoard', (req, res) => {
@@ -108,25 +125,37 @@ app.post('/createBoard', (req, res) => {
     })
 })
 // 수정
-app.post('/createBoard', (req, res) => {
+app.post('/modifyBoard', (req, res) => {
     let body = req.body;
 
-    const sql = '';
-    const params = [body.idx];
+    const sql = 'UPDATE board SET title=?, content=?  WHERE idx=?';
+    const params = [body.title, body.content, body.idx];
     conn.query(sql, params, function (err, result) {
         if (err) console.log('query is not excuted: ' + err);
-        if (result != null) res.send({ message: '게시글 등록 성공', result: 200 });
+        if (result != null) res.send({ message: '게시글 수정 성공', result: 200 });
     })
 })
 
 // 삭제
-app.post('/createBoard', (req, res) => {
+app.post('/deleteBoard', (req, res) => {
     let body = req.body;
 
-    const sql = 'UPDATE board SET isdelet=1 WHERE idx=' + body.idx;
+    const sql = 'UPDATE board SET isdelete=1 WHERE idx=' + body.idx;
     conn.query(sql, function (err, result) {
         if (err) console.log('query is not excuted: ' + err);
         if (result != null) res.send({ message: '게시글 삭제 완료', result: 200 });
+    })
+})
+
+// 본인이 작성한 여러 게시글 불러오기
+app.post('/getUserBoard', (req, res) => {
+    let body = req.body;
+    const sql = 'select idx, title, content, create_date from board where isdelete=\'0\' and user_id=? order by idx DESC';
+    const params = [body.id]
+    conn.query(sql, params, function (err, result) {
+        if (err) console.log('query is not excuted: ' + err);
+        console.log('result2: ', result);
+        res.send({result:result});
     })
 })
 /********************************************************************* */

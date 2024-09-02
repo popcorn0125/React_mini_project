@@ -1,3 +1,5 @@
+database name : react_board
+
 CREATE TABLE member (
 	user_id	VARCHAR(100) NOT NULL PRIMARY KEY COMMENT '사용자 아이디',
 	user_password VARCHAR(150) NOT NULL COMMENT '사용자 비밀번호',
@@ -12,7 +14,8 @@ CREATE TABLE board (
 	title TEXT NOT NULL COMMENT '제목',
 	content	TEXT NULL COMMENT '내용',
 	create_date	TIMESTAMP DEFAULT CURRENT_TIMESTAMP	NOT NULL COMMENT '게시글 등록일',
-	user_id	VARCHAR(100) NOT NULL COMMENT '사용자 아이디'
+	user_id	VARCHAR(100) NOT NULL COMMENT '사용자 아이디',
+	isdelete CHAR(1) NOT NULL DEFAULT '0' COMMENT '삭제 여부'
 );
 
 ALTER TABLE board ADD CONSTRAINT FK_member_TO_board_1 FOREIGN KEY (

@@ -14,6 +14,13 @@ function Top() {
     const goToMyPage = () => {
         movePage('/mypage');
     }
+
+    const logout = () => {
+        sessionStorage.removeItem('USERID');
+        sessionStorage.removeItem('NICKNAME');
+        movePage('/');
+    }
+
     return (
 
         <div className="container">
@@ -34,14 +41,18 @@ function Top() {
 
                             <a  className="navbar-brand" href='javascript:void(0)' ><img className="img-responsive" src="https://bootdey.com/img/Content/avatar/avatar1.png" alt="이미지 불러오기 실패" /></a>
 
-                            <span className="site-name"><b>Dey-Dey</b> Bejarano</span>
-                            <span className="site-description">Developer by passion</span>
+                            <span className="site-name"><b>{sessionStorage.getItem('USERID') ? sessionStorage.getItem('NICKNAME') : 'GUEST'}</b></span>
+                            <span className="site-description" onClick={logout}>{sessionStorage.getItem('USERID') ? '로그아웃' : '로그인' }</span>
                         </div>
                         <div className="collapse navbar-collapse" id="mainNav">
                             <ul className="nav main-menu navbar-nav">
                                 <li><a className="cursor" onClick={goToBoard}><i className="fa fa-home"></i> 자유게시판</a></li>
-                                <li><a className="cursor" onClick={goToInput}>글 작성하기</a></li>
-                                <li><a className="cursor" onClick={goToMyPage}>마이페이지</a></li>
+                                {sessionStorage.getItem('USERID') && (
+                                    <li><a className="cursor" onClick={goToInput}>글 작성하기</a></li>
+                                )}
+                                {sessionStorage.getItem('USERID') && (
+                                    <li><a className="cursor" onClick={goToMyPage}>마이페이지</a></li>
+                                )}
                             </ul>
                         </div>
                     </nav>

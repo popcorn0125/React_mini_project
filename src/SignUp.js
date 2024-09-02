@@ -1,9 +1,13 @@
+import axios from 'axios';
 import './css/Reset.css';
 import './css/SignUp.css';
+import { useNavigate } from 'react-router-dom';
 
 function SignUp() {
+    const movePage = useNavigate();
+    const url = 'http://localhost:5050';
     // 로그인 함수
-    const register = () => {
+    const register = async () => {
         const member = {
             id : document.getElementById("userId").value,
             pw : document.getElementById("user_password").value,
@@ -26,6 +30,27 @@ function SignUp() {
             alert('닉네임을 입력해주세요');
             return;
         }
+        console.log('member id : ',member.id);
+
+        await axios({
+            method: 'post',
+            header: { 'Content-Type': 'application/json; charset=UTF-8' },
+            url: url+"/register",
+            data: member,
+        })
+            .then( response => {
+                if(response.data.result == 1) {
+                    alert(response.data.message);
+                    return ;
+                }
+                if(response.data.result == 200) {
+                    alert(response.data.message);
+                    movePage('/');
+                }
+            })
+            .catch(() => {
+                alert('오류가 발생했습니다. 나중에 다시 실행해주세요'); 
+            })
     }
 
     return(

@@ -1,8 +1,44 @@
 import './css/Reset.css';
 import './css/Input.css';
 import Top from './Top.js';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 function Input() {
+    const movePage = useNavigate();
+    const url = 'http://localhost:5050';
+    const createBoard = () => {
+        const board = {
+            title: document.getElementById("board_title").value,
+            writter: document.getElementById("board_writter").value,
+            content: document.getElementById("board_content").value,
+        }
+        if (board.title === undefined || board.title === null || board.title == '') {
+            alert('제목을 입력해주세요');
+            return;
+        }
+        if (board.content === undefined || board.content === null || board.content == '') {
+            alert('내용을 입력해주세요');
+            return;
+        }
+
+        axios({
+            method: 'post',
+            header: { 'Content-Type': 'application/json; charset=UTF-8' },
+            url: url + "/createBoard",
+            data: board,
+        })
+            .then(response => {
+                if (response.data.result == 200) {
+                    alert(response.data.message);
+                    movePage('/board');
+                }
+            })
+            .catch(() => {
+                alert('오류가 발생했습니다. 나중에 다시 실행해주세요');
+            })
+    }
+
     return (
         <>
             <Top />
@@ -22,20 +58,19 @@ function Input() {
                     <div className="modal__body">
                         <div className="input">
                             <label className="input__label">제목</label>
-                            <input className="input__field" type="text" />
+                            <input className="input__field" type="text" id="board_title" />
                         </div>
                         <div className="input">
                             <label className="input__label">작성자</label>
-                            <input className="input__field" type="text" disabled />
+                            <input className="input__field" type="text" id="board_writter" disabled value={sessionStorage.getItem('USERID')} />
                         </div>
                         <div className="input">
-                            <label className="input__label">내용</label>
-                            <textarea className="input__field input__field--textarea"></textarea>
-                            <p className="input__description">Give your project a good description so everyone knows what it's for</p>
+                            <label className="input__label"  >내용</label>
+                                <textarea className="input__field input__field--textarea" id="board_content"></textarea>
                         </div>
                     </div>
                     <div className="modal__footer">
-                        <button className="button button--primary">글 작성 완료</button>
+                        <button className="button button--primary" onClick={createBoard} >글 작성 완료</button>
                     </div>
                 </div>
             </div>

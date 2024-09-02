@@ -1,33 +1,51 @@
+import { useEffect, useState } from 'react';
 import './css/Board.css';
 import './css/Reset.css';
 import Top from './Top.js';
+import axios from 'axios';
 
 function Board() {
+    const url = 'http://localhost:5050';
+    let [board, setBoard] = useState([]);
+    
+    useEffect(()=>{
+        axios({
+            method: 'post',
+            header: { 'Content-Type': 'application/json; charset=UTF-8' },
+            url: url + "/getBoard",
+        })
+            .then(response => {
+                setBoard(response.data.result);
+            })
+            .catch(() => {
+                alert('데이터를 불러오는데 실패하였습니다. 나중에 다시 시도해주세요.');
+            })
+    }, []);
 
     return (
         <>
             <Top />
-            <div className="blog">
-                <div className="conteudo space">
-                    <div className="post-info">
-                        Posted by Michael
-                    </div>
+            <div className="blog"> 
+                {board.map((info) => (
                     
-                    <h1> Lorem Ipsum Dolor </h1>
-                    <hr />
-                    <p>
-                        Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-                    </p>
-                    <hr/>
-                    <div className="post-info">
-                        작성일 - 2022.02.02 16:55
+                    <div key={info.idx} className="conteudo space">
+                        <div className="post-info">
+                            Posted by {info.nickname}
+                        </div>
+                        <h1>{info.title}</h1>
+                        <hr />
+                        <p>{info.content}</p>
+                        <hr />
+                        <div className="post-info">
+                            작성일 - {info.create_date}
+                        </div>
+                        <br />
+                        <a href={`/detail?no=${info.idx}`} className="continue-lendo">
+                            Read more →
+                        </a>
                     </div>
-                    <br/>
-                    <a href="/detail?no=1" className="continue-lendo">Read more →</a>
-                </div>
-                
+                ))}  
             </div>
-            
         </>
     );
 }

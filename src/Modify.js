@@ -1,8 +1,67 @@
 import './css/Reset.css';
 import './css/Input.css';
 import Top from './Top.js';
+import { useEffect, useState } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import axios from 'axios';
 
 function Modify() {
+    const movePage = useNavigate();
+    const url = 'http://localhost:5050';
+    let [board, setBoard] = useState([]);
+    const [searchParams, setSearchParams]=useSearchParams();
+    const no = parseInt(searchParams.get('no'));
+    const info = {
+        idx:no
+    }
+    useEffect(()=>{
+        axios({
+            method: 'post',
+            header: { 'Content-Type': 'application/json; charset=UTF-8' },
+            url: url + "/detailBoard",
+            data : info
+        })
+            .then(response => {
+                setBoard(response.data.result[0]);
+                console.log(board);
+            })
+            .catch(() => {
+                alert('데이터를 불러오는데 실패하였습니다. 나중에 다시 시도해주세요.');
+            })
+    }, []);
+
+    const modify = () => {
+        if (board.title === undefined || board.title === null || board.title == '') {
+            alert('제목을 입력해주세요');
+            return;
+        }
+        if (board.content === undefined || board.content === null || board.content == '') {
+            alert('내용을 입력해주세요');
+            return;
+        }
+        const boardInfo = {
+            title: document.getElementById("board_title").value,
+            content: document.getElementById("board_content").value,
+            idx : no
+        }
+
+        axios({
+            method: 'post',
+            header: { 'Content-Type': 'application/json; charset=UTF-8' },
+            url: url + "/modifyBoard",
+            data: boardInfo,
+        })
+            .then(response => {
+                if (response.data.result == 200) {
+                    alert(response.data.message);
+                    movePage('/mypage');
+                }
+            })
+            .catch(() => {
+                alert('오류가 발생했습니다. 나중에 다시 실행해주세요');
+            })
+    }
+
     return (
         <>
             <Top />
@@ -23,20 +82,20 @@ function Modify() {
                     <div className="modal__body">
                         <div className="input">
                             <label className="input__label">제목</label>
-                            <input className="input__field" type="text" />
+                            <input className="input__field" type="text" id="board_title" value={board.title} onChange={(e) => setBoard({ ...board, title: e.target.value })} />
                         </div>
                         <div className="input">
                             <label className="input__label">작성자</label>
-                            <input className="input__field" type="text" disabled value="adf" />
+                            <input className="input__field" type="text" disabled id="board_writter" value={board.nickname}  />
                         </div>
                         <div className="input">
                             <label className="input__label">내용</label>
-                            <textarea className="input__field input__field--textarea"></textarea>
+                            <textarea className="input__field input__field--textarea" id="board_content" value={board.content} onChange={(e) => setBoard({ ...board, content: e.target.value })}></textarea>
                             <p className="input__description">Give your project a good description so everyone knows what it's for</p>
                         </div>
                     </div>
                     <div className="modal__footer">
-                        <button className="button button--primary">게시글 수정</button>
+                        <button className="button button--primary" onClick={modify}>게시글 수정</button>
                     </div>
                 </div>
             </div>

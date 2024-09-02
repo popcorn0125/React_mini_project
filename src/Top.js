@@ -2,8 +2,10 @@ import './css/Top.css';
 import './css/Reset.css';
 import image from './img/Hello.png';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 function Top() {
+    const url = 'http://localhost:5050';
     const movePage = useNavigate();
     const goToInput = () => {
         movePage('/input');
@@ -16,6 +18,20 @@ function Top() {
     }
 
     const logout = () => {
+        const info = {
+            id: sessionStorage.getItem('USERID'),
+            nickname: sessionStorage.getItem('NICKNAME')
+        }
+        axios({
+            method: 'post',
+            header: { 'Content-Type': 'application/json; charset=UTF-8' },
+            url: url + "/logout",
+            data : info
+        })
+            .then(() => {
+                
+            })
+        alert('로그아웃을 완료했습니다.');
         sessionStorage.removeItem('USERID');
         sessionStorage.removeItem('NICKNAME');
         movePage('/');

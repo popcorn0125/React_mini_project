@@ -26,7 +26,7 @@ function Detail() {
                 fetchedBoard.create_date = date.toLocaleString();
 
                 setBoard(fetchedBoard);
-                console.log(board);
+
             })
             .catch(() => {
                 alert('데이터를 불러오는데 실패하였습니다. 나중에 다시 시도해주세요.');

@@ -154,8 +154,18 @@ app.post('/getUserBoard', (req, res) => {
     const params = [body.id]
     conn.query(sql, params, function (err, result) {
         if (err) console.log('query is not excuted: ' + err);
-        console.log('result2: ', result);
         res.send({result:result});
+    })
+})
+
+// 사용자가 금일 작성한 게시글 수
+app.post('/userBoardCount', (req, res) => {
+    let body = req.body;
+    const sql = 'select count(idx) as count from board where user_id=? and isdelete=\'0\' and create_date like ?';
+    const params = [body.id, body.date + '%'];
+    conn.query(sql, params, function(err, result) {
+        if(err) console.log('query is not excuted: ' + err);
+        res.send({result:result[0].count});
     })
 })
 /********************************************************************* */
